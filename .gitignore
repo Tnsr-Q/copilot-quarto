@@ -106,3 +106,6 @@ test-results/
 _site/
 *_files/
 renv/library/
+
+# Demo/example project directories created by this tool
+ai-tools-tracker/
