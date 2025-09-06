@@ -1,0 +1,532 @@
+[
+  {
+    "name": "quarto_create_project_with_renv_and_git",
+    "description": "Scaffold a new Quarto project folder, initialise renv, git, and a GitHub-ready README.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "project_directory_name": { "type": "string", "description": "Name of the new folder (becomes repo name and part of GitHub-Pages URL)." },
+        "create_git_repo": { "type": "boolean", "description": "Run `git init` inside the folder." },
+        "use_renv": { "type": "boolean", "description": "Run `renv::init()` to snapshot R packages." }
+      },
+      "required": ["project_directory_name", "create_git_repo", "use_renv"]
+    }
+  },
+  {
+    "name": "quarto_define_dashboard_format",
+    "description": "Flip a .qmd file into dashboard mode by injecting `format: dashboard` into its YAML header.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "qmd_file_path": { "type": "string", "description": "Relative path to the Quarto file." },
+        "format_type": { "type": "string", "description": "Usually `dashboard`.", "default": "dashboard" }
+      },
+      "required": ["qmd_file_path"]
+    }
+  },
+  {
+    "name": "quarto_define_dashboard_layout",
+    "description": "Write a layout block (rows/columns with widths & heights) into the dashboard YAML.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "qmd_file_path": { "type": "string" },
+        "layout_structure": { "type": "object", "description": "YAML/JSON layout definition." },
+        "orientation": { "type": "string", "description": "`columns` or `rows`.", "default": "columns" }
+      },
+      "required": ["qmd_file_path", "layout_structure"]
+    }
+  },
+  {
+    "name": "quarto_add_dashboard_logo",
+    "description": "Reference a logo image in the dashboard YAML so it appears in the header.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "qmd_file_path": { "type": "string" },
+        "logo_image_path": { "type": "string", "description": "Relative path to PNG/SVG." }
+      },
+      "required": ["qmd_file_path", "logo_image_path"]
+    }
+  },
+  {
+    "name": "quarto_configure_site_yml",
+    "description": "Edit _quarto.yml to set project type, nav-bar, theme, output dir, etc.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "quarto_yml_path": { "type": "string", "description": "Path to _quarto.yml." },
+        "project_type": { "type": "string", "description": "`website`, `book`, etc." },
+        "output_dir": { "type": "string", "description": "Folder for rendered site.", "default": "_site" },
+        "navigation_type": { "type": "string", "description": "`sidebar` or `navbar`." },
+        "pages_list": { "type": "array", "items": { "type": "string" }, "description": "Ordered list of .qmd files." },
+        "theme_config": { "type": "string", "description": "Theme name or array `[cosmo, custom.scss]`." }
+      },
+      "required": ["quarto_yml_path", "project_type"]
+    }
+  },
+  {
+    "name": "quarto_apply_scss_theme",
+    "description": "Append a custom SCSS file to the theme list in _quarto.yml.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "quarto_yml_path": { "type": "string" },
+        "scss_file_path": { "type": "string" }
+      },
+      "required": ["quarto_yml_path", "scss_file_path"]
+    }
+  },
+  {
+    "name": "quarto_render_local",
+    "description": "Run `quarto render` on a file or whole project for local preview.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "qmd_file_path": { "type": "string", "description": "Leave empty to render whole project." }
+      }
+    }
+  },
+  {
+    "name": "github_create_repository",
+    "description": "Create a new GitHub repo (public or private).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "repository_name": { "type": "string" },
+        "visibility": { "type": "string", "enum": ["public", "private"] }
+      },
+      "required": ["repository_name", "visibility"]
+    }
+  },
+  {
+    "name": "git_push_project",
+    "description": "Stage, commit and push local Quarto project to the remote GitHub repo.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "local_project_path": { "type": "string" },
+        "github_repo_url": { "type": "string", "description": "HTTPS or SSH clone URL." }
+      },
+      "required": ["local_project_path", "github_repo_url"]
+    }
+  },
+  {
+    "name": "github_actions_configure_publishing_workflow",
+    "description": "Create `.github/workflows/publish.yml` that installs R + Quarto, restores renv, renders and deploys to GitHub-Pages on every push to main.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "workflow_file_path": { "type": "string", "description": "Target path for the YAML file.", "default": ".github/workflows/publish.yml" },
+        "quarto_docs_workflow_content": { "type": "string", "description": "Optional full YAML content; if omitted a sensible default is generated." }
+      },
+      "required": ["workflow_file_path"]
+    }
+  },
+  {
+    "name": "github_actions_schedule_workflow",
+    "description": "Insert a cron schedule into an existing workflow file.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "workflow_yml_path": { "type": "string" },
+        "cron_expression": { "type": "string", "description": "Valid cron string, e.g. `0 13 * * *`." }
+      },
+      "required": ["workflow_yml_path", "cron_expression"]
+    }
+  },
+  {
+    "name": "github_actions_create_secret",
+    "description": "Create or update an encrypted repo secret (masked in logs).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "repository_name": { "type": "string" },
+        "secret_name": { "type": "string" },
+        "secret_value": { "type": "string" }
+      },
+      "required": ["repository_name", "secret_name", "secret_value"]
+    }
+  },
+  {
+    "name": "github_actions_define_workflow_env",
+    "description": "Add an env-map entry so that `${{ secrets.XXX }}` becomes `Sys.getenv('YYY')` inside R scripts during the workflow.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "workflow_yml_path": { "type": "string" },
+        "r_script_env_name": { "type": "string", "description": "Name seen by R via `Sys.getenv()`." },
+        "github_secret_name": { "type": "string", "description": "Name of the GitHub secret." }
+      },
+      "required": ["workflow_yml_path", "r_script_env_name", "github_secret_name"]
+    }
+  },
+  {
+    "name": "github_create_gh_pages_branch",
+    "description": "Create an orphan `gh-pages` branch (used by GitHub-Pages).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "repository_name": { "type": "string" }
+      },
+      "required": ["repository_name"]
+    }
+  },
+  {
+    "name": "github_pages_configure_deployment_source",
+    "description": "Tell GitHub-Pages to serve from `gh-pages` branch /root folder.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "repository_name": { "type": "string" },
+        "branch_name": { "type": "string", "default": "gh-pages" }
+      },
+      "required": ["repository_name"]
+    }
+  },
+  {
+    "name": "github_actions_monitor_workflow",
+    "description": "Return live logs and status of a given workflow run.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "workflow_run_id": { "type": "string" }
+      },
+      "required": ["workflow_run_id"]
+    }
+  },
+  {
+    "name": "github_actions_rerun_workflow",
+    "description": "Re-trigger a failed workflow run after you fixed the issue.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "workflow_run_id": { "type": "string" }
+      },
+      "required": ["workflow_run_id"]
+    }
+  },
+  {
+    "name": "r_package_renv_install_package",
+    "description": "Install an R package into the project renv library.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "package_name": { "type": "string" }
+      },
+      "required": ["package_name"]
+    }
+  },
+  {
+    "name": "r_package_renv_snapshot",
+    "description": "Update renv.lock with currently loaded packages.",
+    "parameters": { "type": "object" }
+  },
+  {
+    "name": "r_package_renv_status",
+    "description": "Check if installed packages match renv.lock.",
+    "parameters": { "type": "object" }
+  },
+  {
+    "name": "r_store_local_secrets_renviron",
+    "description": "Append a key=value line to .Renviron (auto-restarts R session).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "variable_name": { "type": "string" },
+        "variable_value": { "type": "string" }
+      },
+      "required": ["variable_name", "variable_value"]
+    }
+  },
+  {
+    "name": "r_get_environment_variable",
+    "description": "Wrapper around `Sys.getenv()` to fetch secrets locally or inside GitHub Actions.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "variable_name": { "type": "string" }
+      },
+      "required": ["variable_name"]
+    }
+  },
+  {
+    "name": "r_ojs_define_data",
+    "description": "Send an R data-frame to ObservableJS land via `ojs_define()`.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "r_data_frame": { "type": "string", "description": "Variable name of the data frame." },
+        "ojs_variable_name": { "type": "string" },
+        "chunk_options": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["r_data_frame", "ojs_variable_name"]
+    }
+  },
+  {
+    "name": "r_package_httr2_api_access",
+    "description": "Generic httr2 helper: build url, add bearer token, POST JSON, return parsed response.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "api_endpoint": { "type": "string", "description": "Base URL, e.g. https://api.openai.com/v1" },
+        "request_path_append": { "type": "string", "description": "Resource path, e.g. /chat/completions" },
+        "authentication_token": { "type": "string" },
+        "body_json": { "type": "object" }
+      },
+      "required": ["api_endpoint", "request_path_append", "authentication_token", "body_json"]
+    }
+  },
+  {
+    "name": "r_package_gt_create_table",
+    "description": "Create a gt table object with optional styling list.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "data_frame": { "type": "string" },
+        "gt_options": { "type": "object" }
+      },
+      "required": ["data_frame"]
+    }
+  },
+  {
+    "name": "r_download_file",
+    "description": "Download any file (image, zip, etc.) into the repo.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "url": { "type": "string" },
+        "local_path": { "type": "string" },
+        "mode": { "type": "string", "default": "wb" }
+      },
+      "required": ["url", "local_path"]
+    }
+  },
+  {
+    "name": "r_json_parse",
+    "description": "Parse JSON text into an R list/data-frame.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "json_string": { "type": "string" }
+      },
+      "required": ["json_string"]
+    }
+  },
+  {
+    "name": "r_zip_files_for_download",
+    "description": "Zip a folder so users can download the whole project.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "output_file_path": { "type": "string" },
+        "folder_to_zip": { "type": "string" }
+      },
+      "required": ["output_file_path", "folder_to_zip"]
+    }
+  },
+  {
+    "name": "quarto_define_ojs_chunk",
+    "description": "Insert an ObservableJS code chunk (```ojs) into the current .qmd.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ojs_code_content": { "type": "string" },
+        "chunk_options": { "type": "string", "description": "e.g. `echo: false`" }
+      },
+      "required": ["ojs_code_content"]
+    }
+  },
+  {
+    "name": "ojs_transpose_data",
+    "description": "Transpose R ➜ OJS data into a tidy OJS array.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ojs_data_variable": { "type": "string" }
+      },
+      "required": ["ojs_data_variable"]
+    }
+  },
+  {
+    "name": "ojs_create_dropdown_menu",
+    "description": "Build an Inputs.select dropdown bound to an OJS array.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "options_data": { "type": "string", "description": "OJS variable holding the options." },
+        "label": { "type": "string" },
+        "unique_options_flag": { "type": "boolean", "default": true }
+      },
+      "required": ["options_data", "label"]
+    }
+  },
+  {
+    "name": "ojs_dynamic_iframe_update",
+    "description": "Swap a placeholder inside an iframe src with the ID that matches the current dropdown selection.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "dropdown_variable": { "type": "string" },
+        "data_set": { "type": "string" },
+        "iframe_html_template": { "type": "string" },
+        "placeholder_string": { "type": "string" }
+      },
+      "required": ["dropdown_variable", "data_set", "iframe_html_template", "placeholder_string"]
+    }
+  },
+  {
+    "name": "quarto_embed_youtube_iframe",
+    "description": "Paste raw YouTube embed code into the doc.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "youtube_embed_code": { "type": "string" }
+      },
+      "required": ["youtube_embed_code"]
+    }
+  },
+  {
+    "name": "quarto_embed_spotify_iframe",
+    "description": "Paste raw Spotify embed code into the doc.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spotify_embed_code": { "type": "string" }
+      },
+      "required": ["spotify_embed_code"]
+    }
+  },
+  {
+    "name": "quarto_embed_shiny_app_iframe",
+    "description": "Embed an externally-hosted Shiny app via iframe.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "shiny_app_url": { "type": "string" },
+        "iframe_height": { "type": "string", "default": "600px" },
+        "iframe_width": { "type": "string", "default": "100%" }
+      },
+      "required": ["shiny_app_url"]
+    }
+  },
+  {
+    "name": "html_iframe_customize_attributes",
+    "description": "Modify any attribute on an existing iframe tag.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "iframe_html": { "type": "string" },
+        "attribute_name": { "type": "string" },
+        "attribute_value": { "type": "string" }
+      },
+      "required": ["iframe_html", "attribute_name", "attribute_value"]
+    }
+  },
+  {
+    "name": "quarto_configure_chunk_output",
+    "description": "Set echo/include for a code chunk.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "code_chunk_header": { "type": "string" },
+        "echo": { "type": "boolean" },
+        "include": { "type": "boolean" }
+      },
+      "required": ["code_chunk_header"]
+    }
+  },
+  {
+    "name": "quarto_name_code_chunk",
+    "description": "Give a chunk a readable name for logs and cross-references.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "code_chunk_header": { "type": "string" },
+        "chunk_name": { "type": "string" }
+      },
+      "required": ["code_chunk_header", "chunk_name"]
+    }
+  },
+  {
+    "name": "quarto_create_gitignore",
+    "description": "Create or overwrite .gitignore with standard Quarto/R exclusions.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "target_folder": { "type": "string" },
+        "gitignore_content": { "type": "string", "description": "Multi-line string; sensible default provided if empty." }
+      },
+      "required": ["target_folder"]
+    }
+  },
+  {
+    "name": "chatgpt_generate_cron_expression",
+    "description": "Ask ChatGPT for a cron string given plain-English schedule and time-zone.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "natural_language_time_description": { "type": "string" },
+        "time_zone": { "type": "string" }
+      },
+      "required": ["natural_language_time_description", "time_zone"]
+    }
+  },
+  {
+    "name": "openai_generate_image",
+    "description": "Call DALL-E /images/generations and save the returned image locally.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "api_key": { "type": "string" },
+        "prompt": { "type": "string" },
+        "output_file_path": { "type": "string" }
+      },
+      "required": ["api_key", "prompt", "output_file_path"]
+    }
+  },
+  {
+    "name": "openai_generate_theme_recommendations",
+    "description": "Ask GPT-4 for a JSON palette (font, primary, secondary, accent) based on a theme phrase.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "api_key": { "type": "string" },
+        "user_theme_input": { "type": "string" },
+        "output_format": { "type": "string", "default": "JSON" }
+      },
+      "required": ["api_key", "user_theme_input"]
+    }
+  },
+  {
+    "name": "quarto_generate_custom_scss",
+    "description": "Write a custom.scss file that imports Google fonts and sets CSS variables for the theme.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "target_folder": { "type": "string" },
+        "font_family": { "type": "string" },
+        "primary_color": { "type": "string" },
+        "secondary_color": { "type": "string" },
+        "accent_color": { "type": "string" }
+      },
+      "required": ["target_folder", "font_family", "primary_color", "secondary_color", "accent_color"]
+    }
+  },
+  {
+    "name": "quarto_generate_revealjs_slides",
+    "description": "Create a starter slides.qmd ready for RevealJS with your theme, title slide background image, and highlight style.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "target_folder": { "type": "string" },
+        "title": { "type": "string" },
+        "author": { "type": "string" },
+        "theme_file": { "type": "string" },
+        "highlight_style": { "type": "string", "default": "atom-one" },
+        "title_slide_background_image": { "type": "string" }
+      },
+      "required": ["target_folder", "title", "author", "theme_file"]
+    }
+  }
+]
