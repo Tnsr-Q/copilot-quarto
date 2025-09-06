@@ -9,7 +9,7 @@ const yaml = require('yaml');
 class QuartoDefineDashboardFormat extends CopilotQuartoTool {
   constructor() {
     super('quarto_define_dashboard_format', 
-          'Flip a .qmd file into dashboard mode by injecting `format: dashboard` into its YAML header.');
+      'Flip a .qmd file into dashboard mode by injecting `format: dashboard` into its YAML header.');
   }
 
   validateParams(params) {
@@ -101,7 +101,7 @@ class QuartoDefineDashboardFormat extends CopilotQuartoTool {
 class QuartoDefineDashboardLayout extends CopilotQuartoTool {
   constructor() {
     super('quarto_define_dashboard_layout', 
-          'Write a layout block (rows/columns with widths & heights) into the dashboard YAML.');
+      'Write a layout block (rows/columns with widths & heights) into the dashboard YAML.');
   }
 
   validateParams(params) {
@@ -204,7 +204,7 @@ class QuartoDefineDashboardLayout extends CopilotQuartoTool {
 class QuartoAddDashboardLogo extends CopilotQuartoTool {
   constructor() {
     super('quarto_add_dashboard_logo', 
-          'Reference a logo image in the dashboard YAML so it appears in the header.');
+      'Reference a logo image in the dashboard YAML so it appears in the header.');
   }
 
   validateParams(params) {

@@ -9,7 +9,7 @@ const path = require('path');
 class OpenaiGenerateThemeRecommendations extends CopilotQuartoTool {
   constructor() {
     super('openai_generate_theme_recommendations', 
-          'Ask GPT-4 for a JSON palette (font, primary, secondary, accent) based on a theme phrase.');
+      'Ask GPT-4 for a JSON palette (font, primary, secondary, accent) based on a theme phrase.');
   }
 
   validateParams(params) {
@@ -109,7 +109,7 @@ The colors should work well together and match the theme aesthetic. Choose color
 class OpenaiGenerateImage extends CopilotQuartoTool {
   constructor() {
     super('openai_generate_image', 
-          'Call DALL-E /images/generations and save the returned image locally.');
+      'Call DALL-E /images/generations and save the returned image locally.');
   }
 
   validateParams(params) {
@@ -190,7 +190,7 @@ class OpenaiGenerateImage extends CopilotQuartoTool {
 class QuartoGenerateCustomScss extends CopilotQuartoTool {
   constructor() {
     super('quarto_generate_custom_scss', 
-          'Write a custom.scss file that imports Google fonts and sets CSS variables for the theme.');
+      'Write a custom.scss file that imports Google fonts and sets CSS variables for the theme.');
   }
 
   validateParams(params) {
