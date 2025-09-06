@@ -2,6 +2,7 @@ const { CopilotQuartoTool } = require('../core');
 const { execSync } = require('child_process');
 const fs = require('fs-extra');
 const path = require('path');
+const os = require('os');
 const axios = require('axios');
 
 /**
@@ -269,9 +270,17 @@ class RPackageHttr2ApiAccess extends CopilotQuartoTool {
     this.log(`Generating httr2 API call to: ${api_endpoint}${request_path_append}`);
     
     try {
-      // Generate R code for httr2 API call
+      // Create temporary files for secure handling of sensitive data
+      const tempTokenFile = path.join(os.tmpdir(), 'copilot_api_token.txt');
+      const tempJsonFile = path.join(os.tmpdir(), 'copilot_api_body.json');
+      
+      // Write token and JSON data to temporary files with restricted permissions
+      await fs.writeFile(tempTokenFile, authentication_token, { mode: 0o600 });
+      await fs.writeFile(tempJsonFile, JSON.stringify(body_json), { mode: 0o600 });
+      
+      // Generate R code for httr2 API call with secure token handling
       const rCode = `
-# Generic httr2 API helper function
+# Generic httr2 API helper function with secure token handling
 library(httr2)
 library(jsonlite)
 
@@ -298,19 +307,47 @@ api_call <- function(endpoint, path, token, body_data) {
   resp_body_json(resp)
 }
 
+# Securely read authentication token from environment variable or file
+auth_token <- Sys.getenv("COPILOT_API_TOKEN")
+if (auth_token == "") {
+  # Fallback: read from temporary file if available
+  temp_token_file <- file.path(tempdir(), "copilot_api_token.txt")
+  if (file.exists(temp_token_file)) {
+    auth_token <- trimws(readLines(temp_token_file, warn = FALSE)[1])
+  } else {
+    stop("No authentication token provided via environment variable or temporary file")
+  }
+}
+
+# Securely read JSON body data
+body_json_data <- NULL
+body_env_var <- Sys.getenv("COPILOT_API_BODY")
+if (body_env_var != "") {
+  # JSON body provided via environment variable
+  body_json_data <- fromJSON(body_env_var, simplifyVector = FALSE)
+} else {
+  # Fallback: read from temporary file if available
+  temp_json_file <- file.path(tempdir(), "copilot_api_body.json")
+  if (file.exists(temp_json_file)) {
+    body_json_data <- fromJSON(temp_json_file, simplifyVector = FALSE)
+  } else {
+    stop("No JSON body data provided via environment variable or temporary file")
+  }
+}
+
 # Make the API call
 result <- api_call(
   endpoint = "${api_endpoint}",
   path = "${request_path_append}", 
-  token = "${authentication_token}",
-  body_data = fromJSON('${JSON.stringify(body_json)}', simplifyVector = FALSE)
+  token = auth_token,
+  body_data = body_json_data
 )
 
 print("API call successful")
 str(result)
 `;
 
-      this.success('Generated httr2 API call code');
+      this.success('Generated httr2 API call code with secure token handling');
       
       return {
         success: true,
@@ -318,6 +355,9 @@ str(result)
         request_path: request_path_append,
         full_url: `${api_endpoint}${request_path_append}`,
         r_code: rCode,
+        temp_token_file: tempTokenFile,
+        temp_json_file: tempJsonFile,
+        security_note: 'Authentication token and JSON data are now passed via temporary files with restricted permissions to prevent credential exposure',
         usage_note: 'Make sure to install httr2 package: install.packages("httr2")'
       };
     } catch (error) {
@@ -553,7 +593,7 @@ class RJsonParse extends CopilotQuartoTool {
     this.log('Generating JSON parsing code');
     
     try {
-      // Generate R code for JSON parsing
+      // Generate R code for JSON parsing using secure file-based approach
       const rCode = `
 library(jsonlite)
 
@@ -569,8 +609,22 @@ parse_json_safely <- function(json_text) {
   })
 }
 
-# Parse the provided JSON
-json_text <- '${json_string.replace(/'/g, '\\\'')}'
+# Securely read JSON from environment variable or file
+json_env_var <- Sys.getenv("COPILOT_JSON_DATA")
+if (json_env_var != "") {
+  # JSON data provided via environment variable
+  json_text <- json_env_var
+} else {
+  # Fallback: read from temporary file if available
+  temp_json_file <- file.path(tempdir(), "copilot_json_data.json")
+  if (file.exists(temp_json_file)) {
+    json_text <- readLines(temp_json_file, warn = FALSE)
+    json_text <- paste(json_text, collapse = "")
+  } else {
+    stop("No JSON data provided via environment variable or temporary file")
+  }
+}
+
 parsed_data <- parse_json_safely(json_text)
 
 if (!is.null(parsed_data)) {
@@ -597,6 +651,10 @@ if (!is.null(parsed_data)) {
         parseError = error.message;
       }
 
+      // Create a temporary file with the JSON data for secure handling
+      const tempJsonFile = path.join(os.tmpdir(), 'copilot_json_data.json');
+      await fs.writeFile(tempJsonFile, json_string, 'utf8');
+
       this.success('Generated JSON parsing code');
       
       return {
@@ -604,6 +662,8 @@ if (!is.null(parsed_data)) {
         json_valid: isValidJson,
         parse_error: parseError,
         r_code: rCode,
+        temp_json_file: tempJsonFile,
+        security_note: 'JSON data is now passed via temporary file to prevent code injection',
         package_required: 'jsonlite'
       };
     } catch (error) {

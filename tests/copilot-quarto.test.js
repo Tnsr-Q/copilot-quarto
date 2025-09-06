@@ -206,6 +206,79 @@ describe('CopilotQuarto', () => {
     });
   });
 
+  describe('R-advanced security features', () => {
+    test('should handle JSON parsing securely without code injection', async () => {
+      const testJson = '{"name": "test", "value": 123, "description": "safe data"}';
+      
+      const result = await copilot.execute('r_json_parse', {
+        json_string: testJson
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.json_valid).toBe(true);
+      expect(result.r_code).not.toContain('${');
+      expect(result.r_code).toContain('COPILOT_JSON_DATA');
+      expect(result.r_code).toContain('tempdir()');
+      expect(result.security_note).toContain('prevent code injection');
+      expect(fs.existsSync(result.temp_json_file)).toBe(true);
+    });
+
+    test('should prevent code injection via malicious JSON strings', async () => {
+      // This would be dangerous in the old version but safe now
+      const maliciousJson = '{"cmd": "\'; evil_code(); exit(1); #"}';
+      
+      const result = await copilot.execute('r_json_parse', {
+        json_string: maliciousJson
+      });
+
+      expect(result.success).toBe(true);
+      // This should be valid JSON
+      expect(result.json_valid).toBe(true);
+      // But importantly, the R code should NOT contain the malicious string directly
+      expect(result.r_code).not.toContain('evil_code');
+      expect(result.r_code).not.toContain('exit(1)');
+      // The R code should use secure file-based approach
+      expect(result.r_code).toContain('tempdir()');
+    });
+
+    test('should handle API calls with secure token handling', async () => {
+      const testToken = 'secret_token_12345';
+      const testBody = { action: 'test', data: { id: 1 } };
+      
+      const result = await copilot.execute('r_package_httr2_api_access', {
+        api_endpoint: 'https://api.example.com',
+        request_path_append: '/test',
+        authentication_token: testToken,
+        body_json: testBody
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.r_code).not.toContain(testToken);
+      expect(result.r_code).toContain('COPILOT_API_TOKEN');
+      expect(result.r_code).toContain('auth_token');
+      expect(result.security_note).toContain('prevent credential exposure');
+      expect(fs.existsSync(result.temp_token_file)).toBe(true);
+      expect(fs.existsSync(result.temp_json_file)).toBe(true);
+      
+      // Verify token file has restricted permissions
+      const tokenStats = fs.statSync(result.temp_token_file);
+      expect((tokenStats.mode & 0o077)).toBe(0); // No access for group/others
+    });
+
+    test('should reject invalid JSON gracefully', async () => {
+      const invalidJson = '{"name": "test", "invalid": }';
+      
+      const result = await copilot.execute('r_json_parse', {
+        json_string: invalidJson
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.json_valid).toBe(false);
+      expect(result.parse_error).toBeDefined();
+      expect(result.r_code).toContain('parse_json_safely');
+    });
+  });
+
   describe('Error handling', () => {
     test('should handle unknown tools', async () => {
       await expect(
