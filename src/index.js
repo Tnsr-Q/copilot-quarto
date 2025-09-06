@@ -12,6 +12,28 @@ const {
   QuartoDefineDashboardLayout,
   QuartoAddDashboardLogo
 } = require('./tools/dashboard');
+const {
+  QuartoConfigureSiteYml,
+  QuartoRenderLocal,
+  QuartoCreateGitignore,
+  QuartoDefineOjsChunk
+} = require('./tools/quarto-config');
+const {
+  GithubCreateRepository,
+  GitPushProject,
+  GithubCreateGhPagesBranch,
+  GithubActionsConfigurePublishingWorkflow,
+  GithubActionsScheduleWorkflow,
+  GithubPagesConfigureDeploymentSource
+} = require('./tools/github');
+const {
+  OpenaiGenerateThemeRecommendations,
+  OpenaiGenerateImage,
+  QuartoGenerateCustomScss
+} = require('./tools/openai');
+const {
+  ChatgptGenerateCronExpression
+} = require('./tools/utils');
 
 /**
  * Main entry point for copilot-quarto tools
@@ -38,6 +60,28 @@ class CopilotQuarto {
     this.registry.register(new QuartoDefineDashboardFormat());
     this.registry.register(new QuartoDefineDashboardLayout());
     this.registry.register(new QuartoAddDashboardLogo());
+    
+    // Quarto configuration tools
+    this.registry.register(new QuartoConfigureSiteYml());
+    this.registry.register(new QuartoRenderLocal());
+    this.registry.register(new QuartoCreateGitignore());
+    this.registry.register(new QuartoDefineOjsChunk());
+    
+    // GitHub integration tools
+    this.registry.register(new GithubCreateRepository());
+    this.registry.register(new GitPushProject());
+    this.registry.register(new GithubCreateGhPagesBranch());
+    this.registry.register(new GithubActionsConfigurePublishingWorkflow());
+    this.registry.register(new GithubActionsScheduleWorkflow());
+    this.registry.register(new GithubPagesConfigureDeploymentSource());
+    
+    // OpenAI integration tools
+    this.registry.register(new OpenaiGenerateThemeRecommendations());
+    this.registry.register(new OpenaiGenerateImage());
+    this.registry.register(new QuartoGenerateCustomScss());
+    
+    // Utility tools
+    this.registry.register(new ChatgptGenerateCronExpression());
   }
 
   /**

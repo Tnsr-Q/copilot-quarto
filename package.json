@@ -5,10 +5,12 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "jest",
+    "test": "jest --verbose",
+    "test:watch": "jest --watch",
     "lint": "eslint src/ --ext .js,.ts",
     "build": "tsc",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "demo": "node examples/ai-tools-tracker-demo.js"
   },
   "keywords": [
     "github-copilot",
