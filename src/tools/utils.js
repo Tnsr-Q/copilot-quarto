@@ -7,7 +7,7 @@ const axios = require('axios');
 class ChatgptGenerateCronExpression extends CopilotQuartoTool {
   constructor() {
     super('chatgpt_generate_cron_expression', 
-          'Ask ChatGPT for a cron string given plain-English schedule and time-zone.');
+      'Ask ChatGPT for a cron string given plain-English schedule and time-zone.');
   }
 
   validateParams(params) {

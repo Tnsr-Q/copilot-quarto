@@ -11,7 +11,7 @@ const yaml = require('yaml');
 class GithubCreateRepository extends CopilotQuartoTool {
   constructor() {
     super('github_create_repository', 
-          'Create a new GitHub repo (public or private).');
+      'Create a new GitHub repo (public or private).');
   }
 
   validateParams(params) {
@@ -77,7 +77,7 @@ class GithubCreateRepository extends CopilotQuartoTool {
 class GitPushProject extends CopilotQuartoTool {
   constructor() {
     super('git_push_project', 
-          'Stage, commit and push local Quarto project to the remote GitHub repo.');
+      'Stage, commit and push local Quarto project to the remote GitHub repo.');
   }
 
   validateParams(params) {
@@ -163,7 +163,7 @@ class GitPushProject extends CopilotQuartoTool {
 class GithubCreateGhPagesBranch extends CopilotQuartoTool {
   constructor() {
     super('github_create_gh_pages_branch', 
-          'Create an orphan `gh-pages` branch (used by GitHub-Pages).');
+      'Create an orphan `gh-pages` branch (used by GitHub-Pages).');
   }
 
   validateParams(params) {
@@ -256,7 +256,7 @@ class GithubCreateGhPagesBranch extends CopilotQuartoTool {
 class GithubActionsConfigurePublishingWorkflow extends CopilotQuartoTool {
   constructor() {
     super('github_actions_configure_publishing_workflow', 
-          'Create `.github/workflows/publish.yml` that installs R + Quarto, restores renv, renders and deploys to GitHub-Pages on every push to main.');
+      'Create `.github/workflows/publish.yml` that installs R + Quarto, restores renv, renders and deploys to GitHub-Pages on every push to main.');
   }
 
   validateParams(params) {
@@ -361,7 +361,7 @@ jobs:
 class GithubActionsScheduleWorkflow extends CopilotQuartoTool {
   constructor() {
     super('github_actions_schedule_workflow', 
-          'Insert a cron schedule into an existing workflow file.');
+      'Insert a cron schedule into an existing workflow file.');
   }
 
   validateParams(params) {
@@ -429,7 +429,7 @@ class GithubActionsScheduleWorkflow extends CopilotQuartoTool {
 class GithubPagesConfigureDeploymentSource extends CopilotQuartoTool {
   constructor() {
     super('github_pages_configure_deployment_source', 
-          'Tell GitHub-Pages to serve from `gh-pages` branch /root folder.');
+      'Tell GitHub-Pages to serve from `gh-pages` branch /root folder.');
   }
 
   validateParams(params) {

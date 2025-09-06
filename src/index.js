@@ -16,7 +16,11 @@ const {
   QuartoConfigureSiteYml,
   QuartoRenderLocal,
   QuartoCreateGitignore,
-  QuartoDefineOjsChunk
+  QuartoDefineOjsChunk,
+  QuartoApplyScssTheme,
+  QuartoConfigureChunkOutput,
+  QuartoNameCodeChunk,
+  QuartoGenerateRevealJsSlides
 } = require('./tools/quarto-config');
 const {
   GithubCreateRepository,
@@ -34,6 +38,37 @@ const {
 const {
   ChatgptGenerateCronExpression
 } = require('./tools/utils');
+
+// Import new tool modules
+const {
+  OjsTransposeData,
+  OjsCreateDropdownMenu,
+  OjsDynamicIframeUpdate
+} = require('./tools/ojs');
+const {
+  GithubActionsCreateSecret,
+  GithubActionsDefineWorkflowEnv,
+  GithubActionsMonitorWorkflow,
+  GithubActionsRerunWorkflow
+} = require('./tools/github-advanced');
+const {
+  RStoreLocalSecretsRenviron,
+  RGetEnvironmentVariable,
+  ROjsDefineData,
+  RPackageHttr2ApiAccess,
+  RPackageGtCreateTable,
+  RDownloadFile,
+  RJsonParse,
+  RZipFilesForDownload
+} = require('./tools/r-advanced');
+const {
+  QuartoEmbedYoutubeIframe,
+  QuartoEmbedSpotifyIframe,
+  QuartoEmbedShinyAppIframe
+} = require('./tools/embedding');
+const {
+  HtmlIframeCustomizeAttributes
+} = require('./tools/html');
 
 /**
  * Main entry point for copilot-quarto tools
@@ -66,6 +101,10 @@ class CopilotQuarto {
     this.registry.register(new QuartoRenderLocal());
     this.registry.register(new QuartoCreateGitignore());
     this.registry.register(new QuartoDefineOjsChunk());
+    this.registry.register(new QuartoApplyScssTheme());
+    this.registry.register(new QuartoConfigureChunkOutput());
+    this.registry.register(new QuartoNameCodeChunk());
+    this.registry.register(new QuartoGenerateRevealJsSlides());
     
     // GitHub integration tools
     this.registry.register(new GithubCreateRepository());
@@ -82,6 +121,35 @@ class CopilotQuarto {
     
     // Utility tools
     this.registry.register(new ChatgptGenerateCronExpression());
+    
+    // OJS data manipulation tools
+    this.registry.register(new OjsTransposeData());
+    this.registry.register(new OjsCreateDropdownMenu());
+    this.registry.register(new OjsDynamicIframeUpdate());
+    
+    // Advanced GitHub Actions tools
+    this.registry.register(new GithubActionsCreateSecret());
+    this.registry.register(new GithubActionsDefineWorkflowEnv());
+    this.registry.register(new GithubActionsMonitorWorkflow());
+    this.registry.register(new GithubActionsRerunWorkflow());
+    
+    // Enhanced R environment tools
+    this.registry.register(new RStoreLocalSecretsRenviron());
+    this.registry.register(new RGetEnvironmentVariable());
+    this.registry.register(new ROjsDefineData());
+    this.registry.register(new RPackageHttr2ApiAccess());
+    this.registry.register(new RPackageGtCreateTable());
+    this.registry.register(new RDownloadFile());
+    this.registry.register(new RJsonParse());
+    this.registry.register(new RZipFilesForDownload());
+    
+    // Content embedding tools
+    this.registry.register(new QuartoEmbedYoutubeIframe());
+    this.registry.register(new QuartoEmbedSpotifyIframe());
+    this.registry.register(new QuartoEmbedShinyAppIframe());
+    
+    // HTML/iframe customization tools
+    this.registry.register(new HtmlIframeCustomizeAttributes());
   }
 
   /**

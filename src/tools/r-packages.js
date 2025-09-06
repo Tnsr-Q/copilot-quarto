@@ -8,7 +8,7 @@ const path = require('path');
 class RPackageRenvInstallPackage extends CopilotQuartoTool {
   constructor() {
     super('r_package_renv_install_package', 
-          'Install an R package into the project renv library.');
+      'Install an R package into the project renv library.');
   }
 
   validateParams(params) {
@@ -67,7 +67,7 @@ class RPackageRenvInstallPackage extends CopilotQuartoTool {
 class RPackageRenvSnapshot extends CopilotQuartoTool {
   constructor() {
     super('r_package_renv_snapshot', 
-          'Update renv.lock with currently loaded packages.');
+      'Update renv.lock with currently loaded packages.');
   }
 
   validateParams(params) {
@@ -114,7 +114,7 @@ class RPackageRenvSnapshot extends CopilotQuartoTool {
 class RPackageRenvStatus extends CopilotQuartoTool {
   constructor() {
     super('r_package_renv_status', 
-          'Check if installed packages match renv.lock.');
+      'Check if installed packages match renv.lock.');
   }
 
   validateParams(params) {

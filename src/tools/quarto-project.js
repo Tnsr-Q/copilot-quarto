@@ -9,7 +9,7 @@ const { execSync } = require('child_process');
 class QuartoCreateProjectWithRenvAndGit extends CopilotQuartoTool {
   constructor() {
     super('quarto_create_project_with_renv_and_git', 
-          'Scaffold a new Quarto project folder, initialise renv, git, and a GitHub-ready README.');
+      'Scaffold a new Quarto project folder, initialise renv, git, and a GitHub-ready README.');
   }
 
   validateParams(params) {
