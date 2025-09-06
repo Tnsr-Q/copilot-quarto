@@ -1,0 +1,230 @@
+[
+  {
+    "name": "quarto_create_project_with_renv_and_git",
+    "description": "Scaffold a new Quarto project folder, initialise renv, git, and a GitHub-ready README.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "project_directory_name": { "type": "string", "description": "Name of the new folder (becomes repo name and part of GitHub Pages URL)." },
+        "create_git_repo": { "type": "boolean", "description": "Run `git init` inside the folder." },
+        "use_renv": { "type": "boolean", "description": "Run `renv::init()` to snapshot R packages." }
+      },
+      "required": ["project_directory_name", "create_git_repo", "use_renv"]
+    }
+  },
+  {
+    "name": "quarto_define_dashboard_format",
+    "description": "Flip a .qmd file into dashboard mode by injecting `format: dashboard` into its YAML header.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "qmd_file_path": { "type": "string" },
+        "format_type": { "type": "string", "default": "dashboard" }
+      },
+      "required": ["qmd_file_path"]
+    }
+  },
+  {
+    "name": "quarto_define_dashboard_layout",
+    "description": "Write a layout block (rows/columns with widths & heights) into the dashboard YAML.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "qmd_file_path": { "type": "string" },
+        "layout_structure": { "type": "object", "description": "YAML/JSON layout definition." },
+        "orientation": { "type": "string", "default": "columns" }
+      },
+      "required": ["qmd_file_path", "layout_structure"]
+    }
+  },
+  {
+    "name": "quarto_add_dashboard_logo",
+    "description": "Reference a logo image in the dashboard YAML so it appears in the header.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "qmd_file_path": { "type": "string" },
+        "logo_image_path": { "type": "string" }
+      },
+      "required": ["qmd_file_path", "logo_image_path"]
+    }
+  },
+  {
+    "name": "quarto_configure_site_yml",
+    "description": "Edit _quarto.yml to set project type, nav-bar, theme, output dir, etc.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "quarto_yml_path": { "type": "string" },
+        "project_type": { "type": "string" },
+        "output_dir": { "type": "string", "default": "_site" },
+        "navigation_type": { "type": "string" },
+        "pages_list": { "type": "array", "items": { "type": "string" } },
+        "theme_config": { "type": "string" }
+      },
+      "required": ["quarto_yml_path", "project_type"]
+    }
+  },
+  {
+    "name": "quarto_apply_scss_theme",
+    "description": "Append a custom SCSS file to the theme list in _quarto.yml.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "quarto_yml_path": { "type": "string" },
+        "scss_file_path": { "type": "string" }
+      },
+      "required": ["quarto_yml_path", "scss_file_path"]
+    }
+  },
+  {
+    "name": "quarto_render_local",
+    "description": "Run `quarto render` on a file or whole project for local preview.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "qmd_file_path": { "type": "string", "description": "Leave empty to render whole project." }
+      }
+    }
+  },
+  {
+    "name": "quarto_customize_callouts",
+    "description": "Define new callout types with SCSS (border, icon, background) and register in YAML.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "scss_file_path": { "type": "string" },
+        "callout_name": { "type": "string" },
+        "icon_code": { "type": "string" },
+        "color": { "type": "string" }
+      },
+      "required": ["scss_file_path", "callout_name"]
+    }
+  },
+  {
+    "name": "quarto_embed_fontawesome",
+    "description": "Insert Font Awesome icons inline in Quarto slides or docs.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "qmd_file_path": { "type": "string" },
+        "icon_shortcode": { "type": "string" },
+        "size": { "type": "string" },
+        "color": { "type": "string" }
+      },
+      "required": ["qmd_file_path", "icon_shortcode"]
+    }
+  },
+  {
+    "name": "quarto_embed_observable",
+    "description": "Insert ObservableJS widgets inside Quarto dashboards for interactivity.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "qmd_file_path": { "type": "string" },
+        "observable_url": { "type": "string" }
+      },
+      "required": ["qmd_file_path", "observable_url"]
+    }
+  },
+  {
+    "name": "quarto_cv_template",
+    "description": "Render a data scientist CV with custom CSS styling and YAML-based metadata.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "qmd_template_path": { "type": "string" },
+        "css_path": { "type": "string" }
+      },
+      "required": ["qmd_template_path"]
+    }
+  },
+  {
+    "name": "github_create_repository",
+    "description": "Create a new GitHub repo (public or private).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "repository_name": { "type": "string" },
+        "visibility": { "type": "string", "enum": ["public", "private"] }
+      },
+      "required": ["repository_name", "visibility"]
+    }
+  },
+  {
+    "name": "github_actions_publish_quarto",
+    "description": "Set up GitHub Actions workflow to render and publish Quarto to GitHub Pages.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "workflow_yml_path": { "type": "string" },
+        "branch": { "type": "string", "default": "main" },
+        "publish_dir": { "type": "string", "default": "_site" }
+      },
+      "required": ["workflow_yml_path"]
+    }
+  },
+  {
+    "name": "ai_generate_quarto_theme",
+    "description": "Use ChatGPT + DALL·E from R Shiny app to generate new Quarto revealjs SCSS theme.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "prompt_text": { "type": "string" },
+        "font": { "type": "string" },
+        "color_palette": { "type": "array", "items": { "type": "string" } },
+        "background_image": { "type": "string" }
+      },
+      "required": ["prompt_text"]
+    }
+  },
+  {
+    "name": "ai_use_chatgpt_rscript",
+    "description": "Call ChatGPT from R (talk_to_ChatGPT.R) for code/text generation inside Quarto workflow.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "prompt": { "type": "string" },
+        "temperature": { "type": "number" },
+        "max_tokens": { "type": "integer" }
+      },
+      "required": ["prompt"]
+    }
+  },
+  {
+    "name": "saspy_quarto_bridge",
+    "description": "Run SAS code inside Quarto documents via Python (saspy) and reticulate.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "sas_code_block": { "type": "string" },
+        "sas_session_config": { "type": "object" }
+      },
+      "required": ["sas_code_block"]
+    }
+  },
+  {
+    "name": "sasmarkdown_quarto_engine",
+    "description": "Render SAS code chunks in Quarto using SASmarkdown package.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "engine_path": { "type": "string" },
+        "sas_code_block": { "type": "string" }
+      },
+      "required": ["engine_path", "sas_code_block"]
+    }
+  },
+  {
+    "name": "quarto_email_reports_blastula",
+    "description": "Send Quarto-rendered emails via Blastula + GitHub Actions.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "qmd_file_path": { "type": "string" },
+        "smtp_credentials": { "type": "object" }
+      },
+      "required": ["qmd_file_path", "smtp_credentials"]
+    }
+  }
+]
